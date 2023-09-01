@@ -2,8 +2,6 @@
 
 // Request two numbers and compare them to see who is higher, lower or equal 
 
-
-
 let num1 = 0;
 let num2 = 0;
 
