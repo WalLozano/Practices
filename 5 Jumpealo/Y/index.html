@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>Jumpealo</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Subir Jump</h1>
+        <div class="form">
+            <label>SurveyID</label>
+            <input type="number" id="surveyId">
+            <label>Jumper</label>
+            <input type="text" id="jumper">
+            <button id="submit">Submit</button>
+        </div>
+    </div>
+
+    <div class="containerData">
+        <h1>CINT JUMPERS</h1>
+        <input type="text" id="search" onkeyup="searchId()" placeholder="Search">
+        <table>
+            <thead>
+                <tr>
+                    <th>Survey Id</th>
+                    <th>Jumper</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+    </div>
+
+
+
+
+
+
+
+    <!-- Firebase CDN -->
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCt3uXy0Z5Ee8WWPBrCj5KKsbgmstoQucY",
+            authDomain: "jumpea.firebaseapp.com",
+            databaseURL: "https://jumpea-default-rtdb.firebaseio.com",
+            projectId: "jumpea",
+            storageBucket: "jumpea.appspot.com",
+            messagingSenderId: "983012458113",
+            appId: "1:983012458113:web:abdfad1dd8587ea8329780"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+
+        import { getDatabase, ref, set, child, get, update, remove, onValue } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+        const db = getDatabase();
+
+        // Getting data from page
+        const subirJump = document.getElementById('submit');
+
+        var surveyID = document.getElementById('surveyId');
+        var jumper = document.getElementById('jumper');
+
+        // Saving data
+
+        function saveData() {
+            set(ref(db, 'survey/' + surveyID.value), {
+                surveyID: Number(surveyID.value),
+                jumper: jumper.value
+            })
+        }
+
+        // button event to send data
+
+        subirJump.addEventListener('click', saveData)
+
+        // Filing the table data
+
+        var survey_id = 0;
+        var tbody = document.getElementById('tbody');
+
+        function AddItemsToTable(survey, jumper) {
+            let trow = document.createElement('tr')
+            let td1 = document.createElement('td')
+            let td2 = document.createElement('td')
+            let td3 = document.createElement('button')
+
+
+            td3.innerHTML = 'Copy';
+            td1.innerHTML = survey;
+            td2.innerHTML = jumper;
+
+
+            trow.appendChild(td1);
+            trow.appendChild(td2);
+            trow.appendChild(td3);
+            tbody.appendChild(trow);
+
+        }
+
+        function AddAllItemsToTable(surveys) {
+            for (var i = 0; i < surveys.length; i++) {
+                AddItemsToTable(surveys[i].surveyID, surveys[i].jumper);
+            }
+        }
+
+        // getting all the data
+
+
+        function getAllDataOnce() {
+            const dbref = ref(db);
+            get(child(dbref, 'survey/')).then((snapshot) => {
+                var data = [];
+
+                snapshot.forEach(childSnapshot => {
+                    data.push(childSnapshot.val());
+                })
+                AddAllItemsToTable(data);
+            })
+        }
+        window.onload = getAllDataOnce;
+
+
+
+    </script>
+
+
+    <script>
+            // searchbox function
+        const searchId = () => {
+            let search = document.getElementById('search').value;
+            let tbody = document.getElementById('tbody');
+            let tr = tbody.getElementsByTagName('tr');
+            for (let i = 0; i < tr.length; i++) {
+                let td = tr[i].getElementsByTagName('td')[0];
+                if (td) {
+                    let txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(search.toUpperCase()) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+    </script>
+
+
+</body>
+
+</html>
